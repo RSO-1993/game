@@ -20,7 +20,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
-
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
             gameRow.classList.add('game__row');
@@ -42,14 +41,16 @@ window.addEventListener('DOMContentLoaded', () => {
         rows.forEach((row, rowIndex) => {
             const cells = row.querySelectorAll('.game__cell');
             cells.forEach((cell, cellIndex) => {
-                const isCellActive = snakeCoords.some(c => c[0] === cellIndex && c[1] === rowIndex);
-                console.log('isCellActive:', isCellActive)
-                if (isCellActive) {
-                    console.log('isCellActive:', isCellActive, cell);
-            }
+                const isCellActive = snakeCoords.some(
+                    c => c[0] === cellIndex && c[1] === rowIndex
+                );
+                // console.log('isCellActive:', isCellActive);
+                // if (isCellActive) {
+                //     console.log('isCellActive:', isCellActive, cell);
+                // }
                 cell.classList.toggle('active', isCellActive);
-            })
-        })
+            });
+        });
     }
 
     function foodSnake() {
@@ -68,7 +69,7 @@ window.addEventListener('DOMContentLoaded', () => {
             snakeFood.push(
                 Math.round(Math.random() * 10), Math.round(Math.random() * 10)
             );
-            console.log(snakeFood);
+            // console.log(snakeFood);
         } else if (snakeCoords[0] == snakeFood[0] &&
             snakeCoords[1] == snakeFood[1]) {
                 snakeFood.splice(0);
