@@ -20,6 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
+
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
             gameRow.classList.add('game__row');
@@ -68,29 +69,31 @@ window.addEventListener('DOMContentLoaded', () => {
                 Math.round(Math.random() * 10), Math.round(Math.random() * 10)
             );
             console.log(snakeFood);
-        } else if (snakeCoords[0] == snakeFood[0] && 
+        } else if (snakeCoords[0] == snakeFood[0] &&
             snakeCoords[1] == snakeFood[1]) {
                 snakeFood.splice(0);
         }
-        
+
     }
 
     function move() {
-        
+        snakeCoords.shift();
+
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1];
         const [headX, headY] = snakeHeadCoords;
 
         if (direction == "right") {
-            snakeCoords.push(snakeHeadCoords + 1);
+            snakeCoords.push([headX + 1, headY]);
         } else if (direction == "left") {
-            snakeCoords.push(snakeHeadCoords - 1);
+            snakeCoords.push([headX - 1, headY]);
+        } else if (direction == "bottom") {
+            snakeCoords.push([headX, headY + 1]);
+        } else if (direction == "left") {
+            snakeCoords.push([headX, headY - 1]);
         }
-        snakeCoords.shift();
-        
 
-        
-        drawSnake('active');
-        foodSnake('food');
+        drawSnake();
+        foodSnake();
     }
 
     drawGrid();
@@ -98,7 +101,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('keydown', keyboardListener);
 
-    move();
-    // setInterval(move, 1000);
+    setInterval(move, 1000);
 
 });
