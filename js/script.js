@@ -1,13 +1,12 @@
 'use strict';
 
-// x - вправо-влево
-// y - вверх-вниз
-
 window.addEventListener('DOMContentLoaded', () => {
 
-    let direction = 'right';
-     
+    const gameContainer = document.querySelector('.game__container');
+
+    let direction = 'right';     
     let snakeCoords = [0, 0];
+    let snakeFood = [];
 
     const keyboardListener = (e) => {
         if (e.key == "ArrowUp") {
@@ -22,7 +21,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
-        const gameContainer = document.querySelector('.game__container');
 
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
@@ -52,7 +50,32 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function foodSnake(activeClass) {
+        const food = document.querySelectorAll('.game__cell');
+
+        food.forEach(item => {
+            if (snakeFood[0] == item.getAttribute('data-coords-x') &&
+            snakeFood[1] == item.getAttribute('data-coords-y')) {
+                item.classList.add(activeClass);
+            } else {
+                item.classList.remove(activeClass);
+            }
+        });
+
+        if (snakeFood.length == 0) {
+            snakeFood.push(
+                Math.round(Math.random() * 10), Math.round(Math.random() * 10)
+            );
+            console.log(snakeFood);
+        } else if (snakeCoords[0] == snakeFood[0] && 
+            snakeCoords[1] == snakeFood[1]) {
+                snakeFood.splice(0);
+        }
+        
+    }
+
     function move() {
+        
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1];
 
         if (direction == "right") {
@@ -60,12 +83,12 @@ window.addEventListener('DOMContentLoaded', () => {
         } else if (direction == "left") {
             snakeCoords.push(snakeHeadCoords - 1);
         }
-        
         snakeCoords.shift();
-    
-        drawSnake('active');
+        
 
-        console.log(snakeCoords);
+        
+        drawSnake('active');
+        foodSnake('food');
     }
 
     drawGrid();
