@@ -21,7 +21,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
-
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
             gameRow.classList.add('game__row');
@@ -66,27 +65,29 @@ window.addEventListener('DOMContentLoaded', () => {
             snakeFood.push(
                 Math.round(Math.random() * 10), Math.round(Math.random() * 10)
             );
-            console.log(snakeFood);
         } else if (snakeCoords[0] == snakeFood[0] && 
             snakeCoords[1] == snakeFood[1]) {
                 snakeFood.splice(0);
-        }
-        
+        }      
     }
 
-    function move() {
-        
+    function move() {       
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1];
 
-        if (direction == "right") {
+        console.log(snakeCoords);
+
+        if (direction == "up") {
+            snakeCoords.push(snakeHeadCoords - 1);
+        } else if (direction == "down") {
             snakeCoords.push(snakeHeadCoords + 1);
         } else if (direction == "left") {
             snakeCoords.push(snakeHeadCoords - 1);
+        } else if (direction == "right") {
+            snakeCoords.push(snakeHeadCoords + 1);
         }
-        snakeCoords.shift();
-        
 
-        
+        snakeCoords.shift();
+             
         drawSnake('active');
         foodSnake('food');
     }
@@ -95,6 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('keydown', keyboardListener);
 
-    setInterval(move, 1000);
+    move();
+    // setInterval(move, 1000);
 
 });
