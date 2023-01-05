@@ -1,11 +1,10 @@
 'use strict';
 
 window.addEventListener('DOMContentLoaded', () => {
-
     const gameContainer = document.querySelector('.game__container');
 
-    let direction = 'right';     
-    let snakeCoords = [0, 0];
+    let direction = 'right';
+    let snakeCoords = [[0, 0], [1, 0], [2, 0]];
     let snakeFood = [];
 
     const keyboardListener = (e) => {
@@ -36,28 +35,31 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function drawSnake(activeClass) {
-        const coords = document.querySelectorAll('.game__cell');
+    function drawSnake() {
+        const rows = document.querySelectorAll('.game__row');
 
-        coords.forEach(item => {         
-            if (snakeCoords[0] == item.getAttribute('data-coords-x') &&
-            snakeCoords[1] == item.getAttribute('data-coords-y')) {
-                item.classList.add(activeClass);
-            } else {
-                item.classList.remove(activeClass);
+        rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('.game__cell');
+            cells.forEach((cell, cellIndex) => {
+                const isCellActive = snakeCoords.some(c => c[0] === cellIndex && c[1] === rowIndex);
+                console.log('isCellActive:', isCellActive)
+                if (isCellActive) {
+                    console.log('isCellActive:', isCellActive, cell);
             }
-        });
+                cell.classList.toggle('active', isCellActive);
+            })
+        })
     }
 
-    function foodSnake(activeClass) {
+    function foodSnake() {
         const food = document.querySelectorAll('.game__cell');
 
         food.forEach(item => {
             if (snakeFood[0] == item.getAttribute('data-coords-x') &&
             snakeFood[1] == item.getAttribute('data-coords-y')) {
-                item.classList.add(activeClass);
+                item.classList.add('food');
             } else {
-                item.classList.remove(activeClass);
+                item.classList.remove('food');
             }
         });
 
@@ -65,35 +67,35 @@ window.addEventListener('DOMContentLoaded', () => {
             snakeFood.push(
                 Math.round(Math.random() * 10), Math.round(Math.random() * 10)
             );
+            console.log(snakeFood);
         } else if (snakeCoords[0] == snakeFood[0] && 
             snakeCoords[1] == snakeFood[1]) {
                 snakeFood.splice(0);
-        }      
+        }
+        
     }
 
-    function move() {       
+    function move() {
+        
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1];
+        const [headX, headY] = snakeHeadCoords;
 
-        console.log(snakeCoords);
-
-        if (direction == "up") {
-            snakeCoords.push(snakeHeadCoords - 1);
-        } else if (direction == "down") {
+        if (direction == "right") {
             snakeCoords.push(snakeHeadCoords + 1);
         } else if (direction == "left") {
             snakeCoords.push(snakeHeadCoords - 1);
-        } else if (direction == "right") {
-            snakeCoords.push(snakeHeadCoords + 1);
         }
-
         snakeCoords.shift();
-             
+        
+
+        
         drawSnake('active');
         foodSnake('food');
     }
 
     drawGrid();
-    
+    drawSnake();
+
     window.addEventListener('keydown', keyboardListener);
 
     move();
