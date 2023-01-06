@@ -1,11 +1,24 @@
 'use strict';
 
 window.addEventListener('DOMContentLoaded', () => {
-    const gameContainer = document.querySelector('.game__container');
 
-    let direction = 'right';
-    let snakeCoords = [[0, 0], [1, 0], [2, 0]];
-    let snakeFood = [];
+    function initGame() {
+        drawGrid();
+        direction = INITIAL_SNAKE_KEYBOARD;
+        snakeCoords = INITIAL_SNAKE_COORDS;
+        snakeFood = INITIAL_SNAKE_FOOD;
+        drawSnake();
+        foodSnake();
+        window.addEventListener('keydown', keyboardListener);
+        setInterval(move, 1000);
+    }
+
+    const INITIAL_SNAKE_COORDS = [[0, 0], [1, 0], [2, 0]],
+          INITIAL_SNAKE_FOOD = [[Math.round(Math.random() * 10), Math.round(Math.random() * 10)]],
+          INITIAL_SNAKE_KEYBOARD = 'right',
+          gameContainer = document.querySelector('.game__container');
+
+    let direction, snakeCoords, snakeFood;
 
     const keyboardListener = (e) => {
         if (e.key == "ArrowUp") {
@@ -44,64 +57,54 @@ window.addEventListener('DOMContentLoaded', () => {
                 const isCellActive = snakeCoords.some(
                     c => c[0] === cellIndex && c[1] === rowIndex
                 );
-                // console.log('isCellActive:', isCellActive);
-                // if (isCellActive) {
-                //     console.log('isCellActive:', isCellActive, cell);
-                // }
-                cell.classList.toggle('active', isCellActive);
+                cell.classList.toggle('snake', isCellActive);
             });
         });
     }
 
     function foodSnake() {
-        const food = document.querySelectorAll('.game__cell');
+        const foodRows = document.querySelectorAll('.game__row');
 
-        food.forEach(item => {
-            if (snakeFood[0] == item.getAttribute('data-coords-x') &&
-            snakeFood[1] == item.getAttribute('data-coords-y')) {
-                item.classList.add('food');
-            } else {
-                item.classList.remove('food');
-            }
+        foodRows.forEach((row, rowIndex) => {
+            const foodCells = row.querySelectorAll('.game__cell');
+            foodCells.forEach((cell, cellIndex) => {
+                const isFoodCellActive = snakeFood.some(
+                    c => c[0] === cellIndex && c[1] === rowIndex
+                );
+                cell.classList.toggle('food', isFoodCellActive);
+            });
         });
-
-        if (snakeFood.length == 0) {
-            snakeFood.push(
-                Math.round(Math.random() * 10), Math.round(Math.random() * 10)
-            );
-            // console.log(snakeFood);
-        } else if (snakeCoords[0] == snakeFood[0] &&
-            snakeCoords[1] == snakeFood[1]) {
-                snakeFood.splice(0);
-        }
-
     }
 
     function move() {
-        snakeCoords.shift();
-
-        const snakeHeadCoords = snakeCoords[snakeCoords.length - 1];
-        const [headX, headY] = snakeHeadCoords;
-
+        const snakeHeadCoords = snakeCoords[snakeCoords.length - 1],
+              [headX, headY] = snakeHeadCoords,
+              snakeFoodCoords = snakeFood[snakeFood.length -1],
+              [foodX, foodY] = snakeFoodCoords;
+        
         if (direction == "right") {
             snakeCoords.push([headX + 1, headY]);
         } else if (direction == "left") {
             snakeCoords.push([headX - 1, headY]);
-        } else if (direction == "bottom") {
+        } else if (direction == "down") {
             snakeCoords.push([headX, headY + 1]);
-        } else if (direction == "left") {
+        } else if (direction == "up") {
             snakeCoords.push([headX, headY - 1]);
+        }
+
+        snakeCoords.shift();
+
+        if (headX == foodX && headY == foodY) {
+            snakeFood.shift();
+            snakeFood.push(
+                [Math.round(Math.random() * 10), Math.round(Math.random() * 10)]
+            );
         }
 
         drawSnake();
         foodSnake();
     }
 
-    drawGrid();
-    drawSnake();
-
-    window.addEventListener('keydown', keyboardListener);
-
-    setInterval(move, 1000);
+    initGame();
 
 });
