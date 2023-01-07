@@ -7,16 +7,15 @@ window.addEventListener('DOMContentLoaded', () => {
         direction = INITIAL_SNAKE_KEYBOARD;
         snakeCoords = INITIAL_SNAKE_COORDS;
         snakeFood = INITIAL_SNAKE_FOOD;
-        drawSnake();
         foodSnake();
+        drawSnake();
         window.addEventListener('keydown', keyboardListener);
         setInterval(move, 1000);
     }
 
     const INITIAL_SNAKE_COORDS = [[0, 0], [1, 0], [2, 0]],
-          INITIAL_SNAKE_FOOD = [[Math.round(Math.random() * 10), Math.round(Math.random() * 10)]],
-          INITIAL_SNAKE_KEYBOARD = 'right',
-          gameContainer = document.querySelector('.game__container');
+          INITIAL_SNAKE_FOOD = [[rndCoordsFood(0, 9), rndCoordsFood(0, 9)]],
+          INITIAL_SNAKE_KEYBOARD = 'right';
 
     let direction, snakeCoords, snakeFood;
 
@@ -33,6 +32,8 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
+        const gameContainer = document.querySelector('.game__container');
+
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
             gameRow.classList.add('game__row');
@@ -46,20 +47,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 gameRow.append(gameCell);
             }
         }
-    }
-
-    function drawSnake() {
-        const rows = document.querySelectorAll('.game__row');
-
-        rows.forEach((row, rowIndex) => {
-            const cells = row.querySelectorAll('.game__cell');
-            cells.forEach((cell, cellIndex) => {
-                const isCellActive = snakeCoords.some(
-                    c => c[0] === cellIndex && c[1] === rowIndex
-                );
-                cell.classList.toggle('snake', isCellActive);
-            });
-        });
     }
 
     function foodSnake() {
@@ -76,33 +63,52 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function rndCoordsFood(min, max) {
+        return Math.round(Math.random() * (max - min)) + min;
+    }
+
+    function drawSnake() {
+        const rows = document.querySelectorAll('.game__row');
+
+        rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('.game__cell');
+            cells.forEach((cell, cellIndex) => {
+                const isCellActive = snakeCoords.some(
+                    c => c[0] === cellIndex && c[1] === rowIndex
+                );
+                cell.classList.toggle('snake', isCellActive);
+            });
+        });
+    }
+
     function move() {
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1],
               [headX, headY] = snakeHeadCoords,
               snakeFoodCoords = snakeFood[snakeFood.length -1],
               [foodX, foodY] = snakeFoodCoords;
-        
-        if (direction == "right") {
-            snakeCoords.push([headX + 1, headY]);
-        } else if (direction == "left") {
-            snakeCoords.push([headX - 1, headY]);
-        } else if (direction == "down") {
-            snakeCoords.push([headX, headY + 1]);
-        } else if (direction == "up") {
-            snakeCoords.push([headX, headY - 1]);
-        }
 
-        snakeCoords.shift();
+        let countHeadX = headX === 9 ? -1 : headX < 0 ? 9 : headX,
+            countHeadY = headY === 9 ? -1 : headY < 0 ? 9 : headY;
 
         if (headX == foodX && headY == foodY) {
             snakeFood.shift();
-            snakeFood.push(
-                [Math.round(Math.random() * 10), Math.round(Math.random() * 10)]
-            );
+            snakeCoords.push([foodX, foodY]);   
+            snakeFood.push([rndCoordsFood(0, 9), rndCoordsFood(0, 9)]);
         }
 
-        drawSnake();
+        if (direction == 'right') {
+            snakeCoords.push([countHeadX + 1, countHeadY]);
+        } else if (direction == 'left') {
+            snakeCoords.push([countHeadX - 1, countHeadY]);
+        } else if (direction == 'down') {
+            snakeCoords.push([countHeadX, countHeadY + 1]);
+        } else if (direction == 'up') {
+            snakeCoords.push([countHeadX, countHeadY - 1]);
+        }
+        snakeCoords.shift();
+
         foodSnake();
+        drawSnake();
     }
 
     initGame();
