@@ -2,22 +2,15 @@
 
 window.addEventListener('DOMContentLoaded', () => {
 
-    function initGame() {
-        drawGrid();
-        direction = INITIAL_SNAKE_KEYBOARD;
-        snakeCoords = INITIAL_SNAKE_COORDS;
-        snakeFood = INITIAL_SNAKE_FOOD;
-        foodSnake();
-        drawSnake();
+    function start() {
         window.addEventListener('keydown', keyboardListener);
-        setInterval(move, 1000);
+        drawGrid();
+        setInterval(move, 500);
     }
 
-    const INITIAL_SNAKE_COORDS = [[0, 0], [1, 0], [2, 0]],
-          INITIAL_SNAKE_FOOD = [[rndCoordsFood(0, 9), rndCoordsFood(0, 9)]],
-          INITIAL_SNAKE_KEYBOARD = 'right';
-
-    let direction, snakeCoords, snakeFood;
+    let snakeCoords = [[0, 0], [1, 0], [2, 0]],
+        snakeFood = [[rnd(0, 9), rnd(0, 9)]],
+        direction = 'right';
 
     const keyboardListener = (e) => {
         if (e.key == "ArrowUp") {
@@ -49,9 +42,21 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function foodSnake() {
-        const foodRows = document.querySelectorAll('.game__row');
+    function drawSnake() {
+        const rows = document.querySelectorAll('.game__row');
+        rows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('.game__cell');
+            cells.forEach((cell, cellIndex) => {
+                const isCellActive = snakeCoords.some(
+                    c => c[0] === cellIndex && c[1] === rowIndex
+                );
+                cell.classList.toggle('snake', isCellActive);  
+            });
+        });
+    }
 
+    function drawFood() {
+        const foodRows = document.querySelectorAll('.game__row');
         foodRows.forEach((row, rowIndex) => {
             const foodCells = row.querySelectorAll('.game__cell');
             foodCells.forEach((cell, cellIndex) => {
@@ -63,54 +68,45 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function rndCoordsFood(min, max) {
+    function rnd(min, max) {
         return Math.round(Math.random() * (max - min)) + min;
     }
 
-    function drawSnake() {
-        const rows = document.querySelectorAll('.game__row');
-
-        rows.forEach((row, rowIndex) => {
-            const cells = row.querySelectorAll('.game__cell');
-            cells.forEach((cell, cellIndex) => {
-                const isCellActive = snakeCoords.some(
-                    c => c[0] === cellIndex && c[1] === rowIndex
-                );
-                cell.classList.toggle('snake', isCellActive);
-            });
-        });
-    }
-
-    function move() {
+    function move() {       
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1],
               [headX, headY] = snakeHeadCoords,
               snakeFoodCoords = snakeFood[snakeFood.length -1],
               [foodX, foodY] = snakeFoodCoords;
 
-        let countHeadX = headX === 9 ? -1 : headX < 0 ? 9 : headX,
-            countHeadY = headY === 9 ? -1 : headY < 0 ? 9 : headY;
-
-        if (headX == foodX && headY == foodY) {
+        if (headX === foodX && headY === foodY) {
+            snakeCoords.unshift([foodX, foodY]); 
             snakeFood.shift();
-            snakeCoords.push([foodX, foodY]);   
-            snakeFood.push([rndCoordsFood(0, 9), rndCoordsFood(0, 9)]);
+            snakeFood.push([rnd(0, 9), rnd(0, 9)]);
         }
+        
+        drawSnake();
+        drawFood();
 
         if (direction == 'right') {
-            snakeCoords.push([countHeadX + 1, countHeadY]);
+            snakeCoords.push(
+                [headX > 9 ? 0 : headX < 0 ? 9 : headX + 1, headY]
+            );
         } else if (direction == 'left') {
-            snakeCoords.push([countHeadX - 1, countHeadY]);
+            snakeCoords.push(
+                [headX > 9 ? 0 : headX < 0 ? 9 : headX - 1, headY]
+            );
         } else if (direction == 'down') {
-            snakeCoords.push([countHeadX, countHeadY + 1]);
+            snakeCoords.push(
+                [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY + 1]
+            );
         } else if (direction == 'up') {
-            snakeCoords.push([countHeadX, countHeadY - 1]);
+            snakeCoords.push(
+                [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY - 1]
+            );
         }
         snakeCoords.shift();
-
-        foodSnake();
-        drawSnake();
     }
 
-    initGame();
+    // start();
 
 });
