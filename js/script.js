@@ -8,11 +8,22 @@ window.addEventListener('DOMContentLoaded', () => {
         snakeFood = START_SNAKE_FOOD;
         direction = START_DIRECTION;
         window.addEventListener('keydown', keyboardListener);
+        setInterval(move, 500);
+    }
+
+    function reStart() {
+        const clearGrid = document.querySelectorAll('.game__row, .game__cell');
+        clearGrid.forEach((clr) => clr.remove());
+
+        drawGrid();
+        direction = 'right';
+        snakeCoords = [[0, 0], [1, 0], [2, 0]];
     }
 
     const START_SNAKE_COORDS = [[0, 0], [1, 0], [2, 0]],
           START_SNAKE_FOOD = [[rnd(3, 9), rnd(0, 9)]],
-          START_DIRECTION = 'right';
+          START_DIRECTION = 'right',
+          gameContainer = document.querySelector('.game__container');
 
     let snakeCoords, snakeFood, direction;
 
@@ -29,8 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     function drawGrid() {
-        const gameContainer = document.querySelector('.game__container');
-
         for (let i = 0; i < 10; i++) {
             let gameRow = document.createElement('div');
             gameRow.classList.add('game__row');
@@ -102,24 +111,12 @@ window.addEventListener('DOMContentLoaded', () => {
         drawFood();
 
         if (direction == 'right') {
-            // snakeCoords.push(
-            //     [headX > 9 ? 0 : headX < 0 ? 9 : headX + 1, headY]
-            // );
             snakeCoords.push([headX + 1, headY]);            
         } else if (direction == 'left') {
-            // snakeCoords.push(
-            //     [headX > 9 ? 0 : headX < 0 ? 9 : headX - 1, headY]
-            // );
             snakeCoords.push([headX - 1, headY]);
         } else if (direction == 'down') {
-            // snakeCoords.push(
-            //     [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY + 1]
-            // );
             snakeCoords.push([headX, headY + 1]);
         } else if (direction == 'up') {
-            // snakeCoords.push(
-            //     [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY - 1]
-            // );
             snakeCoords.push([headX, headY - 1]);
         }
         snakeCoords.shift();
@@ -130,12 +127,10 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     
         if (headX > 9 || headY > 9 || headX < 0 || headY < 0 || hit != '') {
-            clearInterval(stop);
+            reStart();
         }
     }
 
     start();
-
-    let stop = setInterval(move, 500);
 
 });
