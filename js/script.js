@@ -3,14 +3,18 @@
 window.addEventListener('DOMContentLoaded', () => {
 
     function start() {
-        window.addEventListener('keydown', keyboardListener);
         drawGrid();
-        setInterval(move, 500);
+        snakeCoords = START_SNAKE_COORDS;
+        snakeFood = START_SNAKE_FOOD;
+        direction = START_DIRECTION;
+        window.addEventListener('keydown', keyboardListener);
     }
 
-    let snakeCoords = [[0, 0], [1, 0], [2, 0]],
-        snakeFood = [[rnd(0, 9), rnd(0, 9)]],
-        direction = 'right';
+    const START_SNAKE_COORDS = [[0, 0], [1, 0], [2, 0]],
+          START_SNAKE_FOOD = [[rnd(3, 9), rnd(0, 9)]],
+          START_DIRECTION = 'right';
+
+    let snakeCoords, snakeFood, direction;
 
     const keyboardListener = (e) => {
         if (e.key == "ArrowUp") {
@@ -72,41 +76,66 @@ window.addEventListener('DOMContentLoaded', () => {
         return Math.round(Math.random() * (max - min)) + min;
     }
 
-    function move() {       
+    function move() {   
         const snakeHeadCoords = snakeCoords[snakeCoords.length - 1],
               [headX, headY] = snakeHeadCoords,
               snakeFoodCoords = snakeFood[snakeFood.length -1],
-              [foodX, foodY] = snakeFoodCoords;
-
+              [foodX, foodY] = snakeFoodCoords;               
+    
         if (headX === foodX && headY === foodY) {
             snakeCoords.unshift([foodX, foodY]); 
             snakeFood.shift();
-            snakeFood.push([rnd(0, 9), rnd(0, 9)]);
-        }
+
+            let newFoodCoords = [];
+            for (let key in snakeCoords) {
+                let [xS, yS] = snakeCoords[key],
+                    [xR, yR] = [rnd(0, 9), rnd(0, 9)];
+                
+                if (xS != xR && yS != yR) {
+                    newFoodCoords = [xR, yR];     
+                }
+            }
+            snakeFood.push(newFoodCoords);
+        }     
         
         drawSnake();
         drawFood();
 
         if (direction == 'right') {
-            snakeCoords.push(
-                [headX > 9 ? 0 : headX < 0 ? 9 : headX + 1, headY]
-            );
+            // snakeCoords.push(
+            //     [headX > 9 ? 0 : headX < 0 ? 9 : headX + 1, headY]
+            // );
+            snakeCoords.push([headX + 1, headY]);            
         } else if (direction == 'left') {
-            snakeCoords.push(
-                [headX > 9 ? 0 : headX < 0 ? 9 : headX - 1, headY]
-            );
+            // snakeCoords.push(
+            //     [headX > 9 ? 0 : headX < 0 ? 9 : headX - 1, headY]
+            // );
+            snakeCoords.push([headX - 1, headY]);
         } else if (direction == 'down') {
-            snakeCoords.push(
-                [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY + 1]
-            );
+            // snakeCoords.push(
+            //     [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY + 1]
+            // );
+            snakeCoords.push([headX, headY + 1]);
         } else if (direction == 'up') {
-            snakeCoords.push(
-                [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY - 1]
-            );
+            // snakeCoords.push(
+            //     [headX, headY > 9 ? 0 : headY < 0 ? 9 : headY - 1]
+            // );
+            snakeCoords.push([headX, headY - 1]);
         }
         snakeCoords.shift();
+
+        let hit = [];
+        hit = snakeCoords.filter((bah) => {
+            return hit[bah] || !(hit[bah] = !0);
+        });
+    
+        if (headX > 9 || headY > 9 || headX < 0 || headY < 0 || hit != '') {
+            clearInterval(stop);
+        }
     }
 
-    // start();
+    start();
+
+    let stop = setInterval(move, 500);
 
 });
